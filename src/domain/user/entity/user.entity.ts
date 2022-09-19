@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BossRaid } from 'src/domain/boss-raid/entity/bossRaid.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -7,4 +8,7 @@ export class User {
 
   @Column()
   nickName: string;
+
+  @OneToMany(() => BossRaid, (bossRaid) => bossRaid.user)
+  raidHistory: BossRaid[];
 }
