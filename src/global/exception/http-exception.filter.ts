@@ -32,6 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const log = {
       timestamp: new Date(),
       url: response.url,
+      status,
       res,
     };
 
