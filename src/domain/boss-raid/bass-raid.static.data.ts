@@ -1,9 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class BossRaidStaticData {
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private httpService: HttpService,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
+  ) {}
 
   public async getStaticBossData() {
     return await this.httpService.axiosRef.get(
@@ -14,7 +19,10 @@ export class BossRaidStaticData {
   public async loadStaticData() {
     const bossData = await this.getStaticBossData();
 
-    console.log('데이터 체크 ', bossData.data);
-    console.log('보스레이드 데이터 [] ', bossData.data.bossRaids);
+    const staticData = bossData.data.bossRaid[0];
+    // const bossRaidSeconds = bossData.data.bossRaids[0].bossRaidLimitSeconds;
+
+    await this.cacheManager.set('bossRaidSeconds', staticData.bossRaidSeconds);
+    await this.cacheManager.set('levels', staticData.levels);
   }
 }
