@@ -9,7 +9,7 @@ import {
 import { BossRaidStatus } from './bossRaid.status';
 
 @Entity()
-export class BossRaid {
+export class BossRaidRecord {
   //{ raidRecordId:number, score:number, enterTime:string, endTime:string
 
   @PrimaryGeneratedColumn()
@@ -43,6 +43,9 @@ export class BossRaid {
   user: User;
 
   public canEnter(): boolean {
-    return true;
+    return (
+      this.raidStatus === BossRaidStatus.SUCCESS ||
+      this.raidStatus === BossRaidStatus.FAIL
+    );
   }
 }
