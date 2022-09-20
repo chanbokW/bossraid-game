@@ -31,4 +31,16 @@ export class UserService {
       await queryRunner.release();
     }
   }
+
+  public async findUserBossHistory(id: number) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    // Todo 응답할 데이터 변경 (변수명 )
+    return await queryRunner.manager.findOne(User, {
+      where: { id },
+      relations: {
+        raidHistory: true,
+      },
+    });
+  }
 }

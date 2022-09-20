@@ -12,5 +12,7 @@ export class UserController {
   }
 
   @Get('/:id')
-  findUser(@Param('id') id: number) {}
+  findUserBossHistory(@Param('id') id: number) {
+    return this.userService.findUserBossHistory(id);
+  }
 }
