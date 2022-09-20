@@ -41,4 +41,8 @@ export class BossRaid {
   @ManyToOne(() => User, (user) => user.raidHistory)
   @JoinColumn()
   user: User;
+
+  public canEnter(): boolean {
+    return true;
+  }
 }
