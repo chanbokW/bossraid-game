@@ -23,6 +23,8 @@ export class BossRaidStaticData {
     // const bossRaidSeconds = bossData.data.bossRaids[0].bossRaidLimitSeconds;
 
     await this.cacheManager.set('bossRaidSeconds', staticData.bossRaidSeconds);
-    await this.cacheManager.set('levels', staticData.levels);
+    await this.cacheManager.set('level_1', staticData.levels[0]);
+    await this.cacheManager.set('level_2', staticData.levels[1]);
+    await this.cacheManager.set('level_3', staticData.levels[2]);
   }
 }
