@@ -1,5 +1,11 @@
 import { User } from 'src/domain/user/entity/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BossRaidStatus } from './bossRaid.status';
 
 @Entity()
@@ -33,5 +39,6 @@ export class BossRaid {
   endTime: Date;
 
   @ManyToOne(() => User, (user) => user.raidHistory)
+  @JoinColumn()
   user: User;
 }
