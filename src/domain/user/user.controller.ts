@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { CreateUserRequest } from './dto/create-user.request.dto';
 import { UserService } from './user.service';
 
@@ -7,11 +14,13 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post()
-  createUser(createUser: CreateUserRequest): Promise<number> {
+  @HttpCode(HttpStatus.CREATED)
+  createUser(createUser: CreateUserRequest) {
     return this.userService.createUser(createUser);
   }
 
   @Get('/:id')
+  @HttpCode(HttpStatus.OK)
   findUserBossHistory(@Param('id') id: number) {
     return this.userService.findUserBossHistory(id);
   }

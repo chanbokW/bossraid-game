@@ -7,7 +7,7 @@ import { User } from './entity/user.entity';
 export class UserService {
   constructor(private dataSource: DataSource) {}
 
-  public async createUser(createUser: CreateUserRequest): Promise<number> {
+  public async createUser(createUser: CreateUserRequest): Promise<{}> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     const entityManager: EntityManager = await queryRunner.manager;
@@ -24,7 +24,7 @@ export class UserService {
     try {
       const saveUser = await entityManager.save(User, { nickName: name });
       await queryRunner.commitTransaction();
-      return saveUser.id;
+      return { userId: saveUser.id };
     } catch (e) {
       await queryRunner.rollbackTransaction();
     } finally {
