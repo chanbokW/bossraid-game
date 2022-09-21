@@ -10,6 +10,7 @@ import {
 import { BossRaidStaticData } from './bass-raid.static.data';
 import { BossRaidService } from './boss-raid.service';
 import { BossRaidEndRequestDto } from './dto/bossRaid.end.dto';
+import { BossRaidRankDto } from './dto/bossRaid.rank.dto';
 import { BossRaidStartRequestDto } from './dto/bossRaid.start.dto';
 
 @Controller('bossRaid')
@@ -36,8 +37,8 @@ export class BossRaidController {
     return this.bossRaidService.endBoss(bossRaidEndRequestDto);
   }
 
-  @Get('/boss')
-  getBoss() {
-    return this.bossRaidStaticData.loadStaticData();
+  @Get('topRankerList')
+  getLankingList(@Body() bossRaidRankDto: BossRaidRankDto) {
+    return this.bossRaidService.getRank(bossRaidRankDto);
   }
 }

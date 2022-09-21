@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { User } from '../user/entity/user.entity';
 import { BossRaidStaticData } from './bass-raid.static.data';
 import { BossRaidEndRequestDto } from './dto/bossRaid.end.dto';
+import { BossRaidRankDto } from './dto/bossRaid.rank.dto';
 import { BossRaidStartRequestDto } from './dto/bossRaid.start.dto';
 import { BossRaidRecord } from './entity/bossRaid.entity';
 import { BossRaidStatus } from './entity/bossRaid.status';
@@ -176,5 +177,37 @@ export class BossRaidService {
     if (level === 0) return 20;
     if (level === 1) return 47;
     if (level === 2) return 85;
+  }
+
+  public async getRank(bossRaidRankDto: BossRaidRankDto) {
+    const result = await this.dataSource
+      .createQueryBuilder(BossRaidRecord, 'b')
+      .leftJoinAndSelect('b.user', 'u')
+      .select('sum(b.score)', 'totalScore')
+      .addSelect('b.userId', 'userId')
+      .where('b.raidStatus =:status', { status: BossRaidStatus.SUCCESS })
+      .groupBy('b.userId')
+      .orderBy('totalScore', 'DESC')
+      .getRawMany();
+
+    let topRankerInfoList: RankingInfo[] = [];
+    let myRankingInfo: RankingInfo;
+
+    for (let i = 0; i < result.length; i++) {
+      topRankerInfoList.push({
+        ranking: i,
+        userId: result[i].userId,
+        totalScore: result[i].totalScore,
+      });
+
+      if (result[i].userId === bossRaidRankDto.userId) {
+        myRankingInfo = topRankerInfoList[i];
+      }
+    }
+
+    return {
+      topRankerInfoList,
+      myRankingInfo,
+    };
   }
 }
