@@ -113,12 +113,22 @@ export class BossRaidService {
     await queryRunner.connect();
     const raidRecord = await queryRunner.manager.findOne(BossRaidRecord, {
       where: { id: bossRaidEndRequestDto.raidRecordId },
+      relations: {
+        user: true,
+      },
     });
 
     if (!raidRecord) {
       throw new HttpException(
         '존재 하지 않은 보스레이드 정보입니다.',
         HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (raidRecord.user.id !== userId) {
+      throw new HttpException(
+        '보스레이드 유저와 종료하신 아이디가 일치하지 않습니다.',
+        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -156,7 +166,7 @@ export class BossRaidService {
       await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
-      throw new HttpException('', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw e;
     } finally {
       await queryRunner.release();
     }
