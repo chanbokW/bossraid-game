@@ -10,7 +10,7 @@ import {
  * @Catch(HttpException)
  * 해당 데코레이터는 필요한 메타 데이터를 ExceptionFilter에 바인딩하여,
  */
-@Catch()
+@Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * @description 예외 처리 함수

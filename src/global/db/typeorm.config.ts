@@ -18,7 +18,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         synchronize: true,
         autoLoadEntities: true,
         logging: true,
-        timezone: '+09:00',
+        timezone: 'Asia/Seoul',
       }),
     }),
   ],

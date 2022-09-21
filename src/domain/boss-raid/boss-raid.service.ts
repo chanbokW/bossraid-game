@@ -2,13 +2,18 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import getKoreaTime from 'src/global/util/time.util';
 import { DataSource } from 'typeorm';
 import { User } from '../user/entity/user.entity';
+import { BossRaidStaticData } from './bass-raid.static.data';
+import { BossRaidEndRequestDto } from './dto/bossRaid.end.dto';
 import { BossRaidStartRequestDto } from './dto/bossRaid.start.dto';
 import { BossRaidRecord } from './entity/bossRaid.entity';
 import { BossRaidStatus } from './entity/bossRaid.status';
 
 @Injectable()
 export class BossRaidService {
-  constructor(private dataSource: DataSource) {}
+  constructor(
+    private dataSource: DataSource,
+    private bossRaidStaticData: BossRaidStaticData,
+  ) {}
 
   /**
    *
@@ -101,5 +106,65 @@ export class BossRaidService {
   /**
    * @description : bossRaid 종료
    */
-  public async endBoss() {}
+  public async endBoss(bossRaidEndRequestDto: BossRaidEndRequestDto) {
+    const { userId, raidRecordId } = bossRaidEndRequestDto;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    const raidRecord = await queryRunner.manager.findOne(BossRaidRecord, {
+      where: { id: bossRaidEndRequestDto.raidRecordId },
+    });
+
+    if (!raidRecord) {
+      throw new HttpException(
+        '존재 하지 않은 보스레이드 정보입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (raidRecord.canEnter()) {
+      throw new HttpException(
+        '이미 보스레이드를 종료 하였습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const now = getKoreaTime();
+    const isBossSuccess = Number(now) - +raidRecord.startTime <= 180 * 1000;
+
+    // Todo 점수 캐싱데이터 가져오기
+    let score: number;
+    let status: BossRaidStatus;
+    if (isBossSuccess) {
+      score = this.getRaidScore(raidRecord.level);
+      status = BossRaidStatus.SUCCESS;
+    } else {
+      score = 0;
+      status = BossRaidStatus.FAIL;
+    }
+
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.update(
+        BossRaidRecord,
+        { id: raidRecordId },
+        {
+          score: score,
+          endTime: now,
+          raidStatus: status,
+        },
+      );
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException('', HttpStatus.INTERNAL_SERVER_ERROR);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  getRaidScore(level: number) {
+    if (level === 0) return 20;
+    if (level === 1) return 47;
+    if (level === 2) return 85;
+  }
 }

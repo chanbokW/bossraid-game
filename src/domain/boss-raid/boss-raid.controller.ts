@@ -4,10 +4,12 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { BossRaidStaticData } from './bass-raid.static.data';
 import { BossRaidService } from './boss-raid.service';
+import { BossRaidEndRequestDto } from './dto/bossRaid.end.dto';
 import { BossRaidStartRequestDto } from './dto/bossRaid.start.dto';
 
 @Controller('bossRaid')
@@ -25,8 +27,13 @@ export class BossRaidController {
 
   @Post('enter')
   @HttpCode(HttpStatus.CREATED)
-  startBoss(@Body() bossRaidStartRequestDto: BossRaidStartRequestDto) {
+  startBossRaid(@Body() bossRaidStartRequestDto: BossRaidStartRequestDto) {
     return this.bossRaidService.startBoss(bossRaidStartRequestDto);
+  }
+
+  @Patch('end')
+  endBossRaid(@Body() bossRaidEndRequestDto: BossRaidEndRequestDto) {
+    return this.bossRaidService.endBoss(bossRaidEndRequestDto);
   }
 
   @Get('/boss')
